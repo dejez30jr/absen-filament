@@ -46,12 +46,16 @@ class AbsenResource extends Resource {
         return $data;
     }
 
+    public static function canEdit($record):bool{
+        return auth()->user()?->is_admin === 1;
+    }
+
     public static function form( Form $form ): Form {
         return $form
         ->schema( [
             Hidden::make( 'user_id' )
             ->default( fn () => auth()->id() ),
-            Hidden::make( 'tanggal_absen' )
+            TextInput::make( 'tanggal_absen' )->disabled()->unique(ignoreRecord: true)
             ->default( now()->toDateString() ),
             TextInput::make( 'nama' )
             ->default( fn () => auth()->user()->name )
@@ -87,6 +91,7 @@ class AbsenResource extends Resource {
         ->columns( [
           TextColumn::make('nama')->label('nama')->searchable(),
           TextColumn::make('nis')->label('NIS'),
+          TextColumn::make('status')->label('status'),
           TextColumn::make('tanggal_absen')->label('tanggal absen'),
           TextColumn::make('jurusan')->label('jurusan')->searchable(),
           TextColumn::make('kelas')->label('kelas')->searchable(),
